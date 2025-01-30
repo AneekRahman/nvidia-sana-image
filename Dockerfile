@@ -19,6 +19,7 @@ COPY configs configs
 COPY sana sana
 COPY app app
 COPY tools tools
+COPY model_cache model_cache
 
 COPY environment_setup.sh environment_setup.sh
 RUN ./environment_setup.sh
