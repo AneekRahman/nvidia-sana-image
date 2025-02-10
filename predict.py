@@ -12,7 +12,7 @@ from app.sana_pipeline import SanaPipeline
 
 
 MODEL_CACHE = "model_cache"
-HF_MODEL_CARD_NAME = "Efficient-Large-Model/Sana_1600M_1024px"
+MODEL_URL = f"https://weights.replicate.delivery/default/NVlabs/Sana/{MODEL_CACHE}.tar"
 
 os.environ.update(
     {
@@ -27,11 +27,12 @@ os.environ.update(
 )
 
 
-def download_weights(hf_model_name, dest):
+def download_weights(url, dest):
     start = time.time()
-    print("Saving model cache")
-    subprocess.check_call(["huggingface-cli", "download", hf_model_name, "--local-dir", dest], close_fds=False)
-    print("Model downloading took: ", time.time() - start)
+    print("downloading url: ", url)
+    print("downloading to: ", dest)
+    subprocess.check_call(["pget", "-x", url, dest], close_fds=False)
+    print("downloading took: ", time.time() - start)
 
 
 class Predictor(BasePredictor):
@@ -39,7 +40,7 @@ class Predictor(BasePredictor):
         """Load the model into memory to make running multiple predictions efficient"""
 
         if not os.path.exists(MODEL_CACHE):
-            download_weights(HF_MODEL_CARD_NAME, MODEL_CACHE)
+            download_weights(MODEL_URL, MODEL_CACHE)
 
         config_path = "configs/sana_config/1024ms/Sana_1600M_img1024.yaml"
         self.pipe = SanaPipeline(config_path)
